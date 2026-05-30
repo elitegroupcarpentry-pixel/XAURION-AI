@@ -633,13 +633,16 @@ function startApp() {
   document.getElementById('screen-app').style.display = 'flex';
   loadAccountFromStorage();
   activeSignals = loadActiveSignals();
-  initTVChart();
-  runAnalysis();
-  priceMonInt = setInterval(monitorPrices, 60000);
   renderPerfPanel();
   renderGestaoPanel();
   renderHistoryFull();
   renderAlerts();
+  // Delay chart init so the DOM is fully painted first
+  setTimeout(() => {
+    initTVChart();
+    runAnalysis();
+  }, 100);
+  priceMonInt = setInterval(monitorPrices, 60000);
 }
 
 function logout() {
@@ -1152,10 +1155,9 @@ function toUnix(dt){
 function initTVChart(){
   if(chartInitialized) return;
   const container=document.getElementById('tv-chart');
-  if(!container||!window.LightweightCharts) return;
-  const w=container.parentElement.clientWidth-22;
+  if(!container||!window.LightweightCharts) { console.warn('Chart container or LightweightCharts not found'); return; }
   tvChart=LightweightCharts.createChart(container,{
-    width:w, height:240,
+    autoSize:true, height:240,
     layout:{ background:{color:'#060D14'}, textColor:'#3D5A6E' },
     grid:{ vertLines:{color:'rgba(0,245,255,0.04)'}, horzLines:{color:'rgba(0,245,255,0.04)'} },
     crosshair:{ mode:LightweightCharts.CrosshairMode.Normal },
@@ -1167,11 +1169,15 @@ function initTVChart(){
   tvEma20=tvChart.addLineSeries({ color:'#00B0FF',lineWidth:1,title:'EMA20',priceLineVisible:false,lastValueVisible:false });
   tvEma200=tvChart.addLineSeries({ color:'#8B5CF6',lineWidth:1.5,title:'EMA200',priceLineVisible:false,lastValueVisible:false });
   chartInitialized=true;
-  new ResizeObserver(()=>{ if(tvChart){ const el=document.getElementById('tv-chart'); tvChart.resize(el.parentElement.clientWidth-22,240); } }).observe(container.parentElement);
+  console.log('Chart initialized OK');
 }
 
 function updateTVChart(candles){
-  if(!tvChart||!candles||!candles.length) return;
+  if(!candles||!candles.length) return;
+  if(!tvChart||!chartInitialized){
+    initTVChart();
+    if(!tvChart) return;
+  }
   const candleData=candles.map(c=>({ time:toUnix(c.datetime),open:c.open,high:c.high,low:c.low,close:c.close }));
   tvCandle.setData(candleData);
   const closes=candles.map(c=>c.close);
@@ -1192,6 +1198,7 @@ async function switchChartTF(tf, btn){
   curChartTF=tf;
   document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  if(!tvChart) initTVChart();
   const apiSym=ASSETS[curAsset].sym;
   const interval=TF_API[tf];
   const outputsize=tf==='4H'||tf==='1D'?100:200;
@@ -1338,7 +1345,7 @@ function renderOverviewSignal(signal, tfResults, inds, mgmt, currentPrice){
       <div><div style="font-size:9px;color:var(--muted);font-family:'Share Tech Mono',monospace">WINRATE</div><div style="font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700;color:${parseFloat(wr)>=50?'var(--green)':'var(--red)'}">${wr}%</div></div>
     </div>`;
 
-  const clbl=document.getElementById('chart-lbl'); if(clbl) clbl.textContent=curAsset;
+  const clbl=document.getElementById('chart-lbl'); if(clbl) clbl.textContent=ASSETS[curAsset]?.label||curAsset;
   updateGestaoDisplay();
 }
 
@@ -1406,6 +1413,7 @@ function switchAsset(asset){
 async function runAnalysis(){
   const btn=document.getElementById('btn-analyze');
   if(btn){ btn.disabled=true; btn.textContent='⟳ ANALISANDO...'; }
+  try {
   const apiSym=ASSETS[curAsset].sym;
   const dec=ASSETS[curAsset].dec;
 
@@ -1479,6 +1487,11 @@ async function runAnalysis(){
 
   if(btn){ btn.disabled=false; btn.textContent='⚡ ANALISAR AGORA'; }
   resetTicker();
+  } catch(err) {
+    console.error('runAnalysis error:', err);
+    if(btn){ btn.disabled=false; btn.textContent='⚡ ANALISAR AGORA'; }
+    resetTicker();
+  }
 }
 
 async function monitorPrices(){

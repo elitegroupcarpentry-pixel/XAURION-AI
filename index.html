@@ -70,7 +70,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 /* ── OVERVIEW LAYOUT ── */
 .ov-top{display:grid;grid-template-columns:1.1fr 1fr 0.8fr;gap:8px;margin-bottom:8px;}
 .ov-infobar{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
-.ov-middle{display:grid;grid-template-columns:1fr 260px;gap:8px;margin-bottom:8px;}
+.ov-middle{display:grid;grid-template-columns:1fr 240px;gap:8px;margin-bottom:8px;}
 .ov-left{display:flex;flex-direction:column;gap:8px;}
 .ov-right{display:flex;flex-direction:column;gap:8px;}
 
@@ -414,6 +414,28 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
                 </div>
               </div>
             </div>
+            <!-- Below chart: perf + gestao side by side -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <!-- Mini Performance -->
+              <div class="card">
+                <div class="card-title">PERFORMANCE</div>
+                <div class="perf-period-tabs">
+                  <div class="pp-tab active" onclick="switchPerfTab('today',this)">HOJE</div>
+                  <div class="pp-tab" onclick="switchPerfTab('week',this)">SEM</div>
+                  <div class="pp-tab" onclick="switchPerfTab('month',this)">MÊS</div>
+                  <div class="pp-tab" onclick="switchPerfTab('all',this)">TOTAL</div>
+                </div>
+                <div id="perf-rows"></div>
+              </div>
+              <!-- Mini Gestao conta -->
+              <div class="card">
+                <div class="card-title">GESTÃO DA CONTA</div>
+                <div class="go-row"><span class="go-lbl">SALDO</span><span class="go-val" id="gc-bal" style="color:var(--gold)">—</span></div>
+                <div class="go-row"><span class="go-lbl">RISCO/TRADE</span><span class="go-val" id="gc-risk" style="color:var(--red)">—</span></div>
+                <div class="go-row"><span class="go-lbl">LOTE SUGERIDO</span><span class="go-val" id="gc-lot" style="color:var(--cyan)">—</span></div>
+                <div class="go-row"><span class="go-lbl">DRAWDOWN DIA</span><span class="go-val" id="gc-dd" style="color:var(--orange)">—</span></div>
+              </div>
+            </div>
           </div>
 
           <div class="ov-right">
@@ -447,25 +469,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
                 <div id="go-action-wrap"></div>
               </div>
             </div>
-            <!-- Performance do Dia -->
-            <div class="card">
-              <div class="card-title">PERFORMANCE</div>
-              <div class="perf-period-tabs">
-                <div class="pp-tab active" onclick="switchPerfTab('today',this)">HOJE</div>
-                <div class="pp-tab" onclick="switchPerfTab('week',this)">SEMANA</div>
-                <div class="pp-tab" onclick="switchPerfTab('month',this)">MÊS</div>
-                <div class="pp-tab" onclick="switchPerfTab('all',this)">TOTAL</div>
-              </div>
-              <div id="perf-rows"></div>
-            </div>
-            <!-- Gestão conta -->
-            <div class="card">
-              <div class="card-title">GESTÃO DA CONTA</div>
-              <div class="go-row"><span class="go-lbl">SALDO</span><span class="go-val" id="gc-bal" style="color:var(--gold)">—</span></div>
-              <div class="go-row"><span class="go-lbl">RISCO/TRADE</span><span class="go-val" id="gc-risk" style="color:var(--red)">—</span></div>
-              <div class="go-row"><span class="go-lbl">LOTE SUGERIDO</span><span class="go-val" id="gc-lot" style="color:var(--cyan)">—</span></div>
-              <div class="go-row"><span class="go-lbl">DRAWDOWN DIA</span><span class="go-val" id="gc-dd" style="color:var(--orange)">—</span></div>
-            </div>
+
           </div>
         </div>
 
@@ -635,6 +639,7 @@ document.getElementById('l-pwd').addEventListener('keydown', e => { if(e.key==='
 document.getElementById('l-pwd2').addEventListener('keydown', e => { if(e.key==='Enter') handleAuth(); });
 
 function startApp() {
+  localStorage.setItem('xau_session','1');
   document.getElementById('screen-login').style.display = 'none';
   document.getElementById('screen-app').style.display = 'flex';
   loadAccountFromStorage();
@@ -649,6 +654,7 @@ function startApp() {
 }
 
 function logout() {
+  localStorage.removeItem('xau_session');
   clearInterval(tickInt); clearInterval(priceMonInt);
   document.getElementById('screen-app').style.display = 'none';
   document.getElementById('screen-login').style.display = 'flex';
@@ -683,6 +689,9 @@ window.addEventListener('load', () => {
   if(!auth) {
     document.getElementById('login-title').textContent = 'PRIMEIRO ACESSO — CRIE SUA CONTA';
     document.getElementById('login-btn').textContent = 'CONTINUAR';
+  } else if(localStorage.getItem('xau_session')==='1') {
+    startApp();
+    return;
   }
 });
 
@@ -1095,19 +1104,35 @@ function showToast(type, asset, pnl, pips, price, sig){
 // ═══════════════════════════════════════════
 // SOUND
 // ═══════════════════════════════════════════
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx || audioCtx.state==='closed'){
+    audioCtx = new(window.AudioContext||window.webkitAudioContext)();
+  }
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  return audioCtx;
+}
 function playSound(type){
   if(!soundOn) return;
   try{
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const ctx = getAudioCtx();
     const pats={ BUY:[{f:660,d:0},{f:880,d:0.18},{f:1100,d:0.36}], SELL:[{f:440,d:0},{f:330,d:0.2},{f:220,d:0.4}], win:[{f:880,d:0},{f:1100,d:0.15},{f:1320,d:0.3}], loss:[{f:330,d:0},{f:220,d:0.2}] };
-    (pats[type]||pats.BUY).forEach(({f,d})=>{ const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type=type==='loss'||type==='SELL'?'sawtooth':'sine';o.frequency.value=f;g.gain.setValueAtTime(0.5,ctx.currentTime+d);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+d+0.25);o.start(ctx.currentTime+d);o.stop(ctx.currentTime+d+0.25); });
-  }catch(e){}
+    (pats[type]||pats.BUY).forEach(({f,d})=>{ const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type=type==='loss'||type==='SELL'?'sawtooth':'sine';o.frequency.value=f;g.gain.setValueAtTime(0.6,ctx.currentTime+d);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+d+0.28);o.start(ctx.currentTime+d);o.stop(ctx.currentTime+d+0.28); });
+  }catch(e){ console.warn('Sound error:',e); }
 }
 function toggleSound(){
   soundOn=!soundOn;
   const b=document.getElementById('snd-btn');
   b.innerHTML=soundOn?'<i class="fa-solid fa-volume-high"></i>':'<i class="fa-solid fa-volume-xmark"></i>';
-  try{ const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=soundOn?600:300;g.gain.setValueAtTime(0.3,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.12);o.start();o.stop(ctx.currentTime+0.12); }catch(e){}
+  try{
+    const ctx=getAudioCtx();
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.frequency.value=soundOn?700:300;
+    g.gain.setValueAtTime(0.4,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.15);
+    o.start();o.stop(ctx.currentTime+0.15);
+  }catch(e){}
 }
 
 // ═══════════════════════════════════════════
@@ -1277,7 +1302,7 @@ function renderOverviewSignal(signal, tfResults, inds, mgmt, currentPrice){
   if(adxV>=25){ mktState='TREND FORTE'; mktCls='trend'; mktIco=['BUY','BULL'].includes(m5sig)?'<i class="fa-solid fa-arrow-trend-up" style="color:var(--green)"></i>':'<i class="fa-solid fa-arrow-trend-down" style="color:var(--red)"></i>'; }
   else if(adxV>=18){ mktState='EM TENDÊNCIA'; mktCls='trend'; mktIco=['BUY','BULL'].includes(m5sig)?'<i class="fa-solid fa-arrow-trend-up" style="color:var(--green)"></i>':'<i class="fa-solid fa-arrow-trend-down" style="color:var(--red)"></i>'; }
   else{ mktState='RANGING'; mktCls='ranging'; mktIco='<i class="fa-solid fa-arrows-left-right" style="color:var(--gold)"></i>'; }
-  document.getElementById('mkt-ico').textContent=mktIco;
+  document.getElementById('mkt-ico').innerHTML=mktIco;
   document.getElementById('mkt-state').textContent=mktState;
   document.getElementById('mkt-state').className='mkt-state '+mktCls;
   const atr=cache[curAsset]?.atr||0;

@@ -353,11 +353,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
             <div id="tv-chart" style="flex:1;min-height:260px"></div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;flex-wrap:wrap;gap:4px">
               <div class="tf-row">
-                <button class="tf-btn" onclick="switchChartTF('M2',this)">M2</button>
                 <button class="tf-btn active" onclick="switchChartTF('M5',this)">M5</button>
                 <button class="tf-btn" onclick="switchChartTF('M15',this)">M15</button>
                 <button class="tf-btn" onclick="switchChartTF('H1',this)">H1</button>
-                <button class="tf-btn" onclick="switchChartTF('4H',this)">4H</button>
                 <button class="tf-btn" onclick="switchChartTF('1D',this)">1D</button>
               </div>
               <div class="ema-row">
@@ -691,7 +689,7 @@ function switchStat(p,btn){curStat=p;document.querySelectorAll('.ptab').forEach(
 function addAlert(type,msg){
   const list=loadAlertsList();
   const t=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  list.unshift({type,msg,time:t});if(list.length>30)list.pop();
+  list.unshift({type,msg,time:t,asset:curAsset});if(list.length>50)list.pop();
   saveAlertsList(list);renderAlerts();
 }
 function renderAlerts(){
@@ -728,7 +726,32 @@ function renderHistRecent(){renderHistRows('hist-recent','hist-recent-empty',5);
 function renderHistFull(){renderHistRows('hist-full','hist-full-empty',null);}
 
 // ─── API ──────────────────────────────────────
+// Binance interval map
+const BN_TF = {'2min':'1m','5min':'5m','15min':'15m','1h':'1h','4h':'4h','1day':'1d'};
+
+async function fetchCandlesBinance(interval, size=150){
+  try{
+    const bnInterval = BN_TF[interval]||'5m';
+    const r=await fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${bnInterval}&limit=${size}`);
+    const d=await r.json();
+    if(!Array.isArray(d)) return null;
+    return d.map(v=>({
+      open:+v[1],high:+v[2],low:+v[3],close:+v[4],
+      datetime:new Date(v[0]).toISOString().slice(0,16).replace('T',' ')
+    }));
+  }catch{return null;}
+}
+
+async function fetchPriceBinance(){
+  try{
+    const r=await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+    const d=await r.json();
+    return d.price?+d.price:null;
+  }catch{return null;}
+}
+
 async function fetchCandles(sym,interval,size=150){
+  if(sym==='BTC/USD') return fetchCandlesBinance(interval,size);
   try{
     const r=await fetch(`https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(sym)}&interval=${interval}&outputsize=${size}&apikey=${API}`);
     const d=await r.json();
@@ -736,7 +759,9 @@ async function fetchCandles(sym,interval,size=150){
     return d.values.reverse().map(v=>({open:+v.open,high:+v.high,low:+v.low,close:+v.close,datetime:v.datetime}));
   }catch{return null;}
 }
+
 async function fetchPrice(sym){
+  if(sym==='BTC/USD') return fetchPriceBinance();
   try{const r=await fetch(`https://api.twelvedata.com/price?symbol=${encodeURIComponent(sym)}&apikey=${API}`);const d=await r.json();return d.price?+d.price:null;}catch{return null;}
 }
 
@@ -1106,7 +1131,8 @@ function switchAsset(asset){
   document.getElementById('ab-'+asset.replace('/',''))?.classList.add('active');
   const c=cache[asset];
   if(c){const sig=activeSignals[asset]||null;const mgmt=sig&&c.price?checkMgmt(sig,c.price,c.inds||[],c.tfResults||[]):null;renderOverview(sig,c.tfResults||[],c.inds||[],mgmt,c.price);}
-  runAnalysis();
+  // Small delay to avoid API burst
+  setTimeout(()=>runAnalysis(), 500);
 }
 
 // ─── SOUND ────────────────────────────────────
@@ -1133,9 +1159,25 @@ async function runAnalysis(){
   if(btn){btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> ANALISANDO...';}
   try{
     const sym=ASSETS[curAsset].sym,dec=ASSETS[curAsset].dec;
+    // Smart cache: skip fetch if data is less than 4 minutes old (only for XAU - BTC is free)
+    const now=Date.now();
+    const cached=cache[curAsset];
+    if(sym!=='BTC/USD' && cached?.fetchTime && (now-cached.fetchTime)<240000 && cached.m5Candles){
+      // Use cached data, just re-render
+      const signal=activeSignals[curAsset]||null;
+      const mgmt=signal&&cached.price?checkMgmt(signal,cached.price,cached.inds||[],cached.tfResults||[]):null;
+      if(curNav==='overview') renderOverview(signal,cached.tfResults||[],cached.inds||[],mgmt,cached.price);
+      if(btn){btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-bolt"></i> ANALISAR AGORA';}
+      resetTicker();return;
+    }
     const m5=await fetchCandles(sym,'5min',150);
     if(!m5){
-      addAlert('warn',`Sem dados para ${curAsset} — API indisponível`);
+      // Don't spam alerts - only add if last alert was more than 5 minutes ago
+      const alerts=loadAlertsList();
+      const lastApiAlert=alerts.find(a=>a.msg.includes('API indisponível')&&a.asset===curAsset);
+      if(!lastApiAlert||alerts.indexOf(lastApiAlert)>2){
+        addAlert('warn',`Sem dados para ${curAsset} — API indisponível`);
+      }
       if(btn){btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-bolt"></i> ANALISAR AGORA';}
       resetTicker();return;
     }
@@ -1166,7 +1208,7 @@ async function runAnalysis(){
       }
     }
     const mgmt=signal?checkMgmt(signal,price,m5Inds,tfResults):null;
-    cache[curAsset]={m5Candles:m5,price,tfResults,inds:m5Inds,atr:atrV(m5)};
+    cache[curAsset]={m5Candles:m5,price,tfResults,inds:m5Inds,atr:atrV(m5),fetchTime:Date.now()};
     if(curNav==='overview') renderOverview(signal,tfResults,m5Inds,mgmt,price);
     updateChart(m5);
     renderHistRecent();renderPerfMini();renderStats();updateAcctDisplay();
@@ -1187,7 +1229,7 @@ async function monitorPrices(){
 }
 
 function resetTicker(){
-  ticker=300;clearInterval(tickInt);
+  ticker=600;clearInterval(tickInt);
   tickInt=setInterval(()=>{ticker--;if(ticker<=0){runAnalysis();return;}const m=Math.floor(ticker/60).toString().padStart(2,'0'),s=(ticker%60).toString().padStart(2,'0');document.getElementById('countdown').textContent=m+':'+s;},1000);
 }
 </script>

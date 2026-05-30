@@ -1175,21 +1175,25 @@ function switchNav(nav){
   if(nav==='alertas') renderAlerts();
 }
 
+function switchChartTFbyEl(el){
+  const tf = el.getAttribute('data-tf');
+  document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const lbl = document.getElementById('chart-tf-lbl');
+  if(lbl) lbl.textContent = tf;
+  curChartTF = tf;
+  if(!tvChart) initChart();
+  fetchCandles(ASSETS[curAsset].sym, TF_API[tf], 150).then(c=>{ if(c) updateChart(c); });
+}
+
 function updateTFButtons(){
   const el = document.getElementById('tf-buttons');
   if(!el) return;
   if(curAsset === 'XAU/USD'){
-    // XAU: only M5
-    el.innerHTML = '<button class="tf-btn active" onclick="switchChartTF('M5',this)">M5</button>';
+    el.innerHTML = '<button class="tf-btn active" data-tf="M5" onclick="switchChartTFbyEl(this)">M5</button>';
   } else {
-    // BTC: M2, M5, M15, H1, 4H, 1D
-    el.innerHTML = `
-      <button class="tf-btn" onclick="switchChartTF('M2',this)">M2</button>
-      <button class="tf-btn active" onclick="switchChartTF('M5',this)">M5</button>
-      <button class="tf-btn" onclick="switchChartTF('M15',this)">M15</button>
-      <button class="tf-btn" onclick="switchChartTF('H1',this)">H1</button>
-      <button class="tf-btn" onclick="switchChartTF('4H',this)">4H</button>
-      <button class="tf-btn" onclick="switchChartTF('1D',this)">1D</button>`;
+    const tfs = ['M2','M5','M15','H1','4H','1D'];
+    el.innerHTML = tfs.map((t,i)=>'<button class="tf-btn' + (i===1?' active':'') + '" data-tf="' + t + '" onclick="switchChartTFbyEl(this)">' + t + '</button>').join('');
   }
 }
 

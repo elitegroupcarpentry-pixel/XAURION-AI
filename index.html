@@ -352,7 +352,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
             <div class="chart-hdr">GRÁFICO <span id="chart-asset-lbl">XAU/USD</span> · <span id="chart-tf-lbl">M5</span></div>
             <div id="tv-chart" style="flex:1;min-height:260px"></div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;flex-wrap:wrap;gap:4px">
-              <div class="tf-row">
+              <div class="tf-row" id="tf-buttons">
                 <button class="tf-btn active" onclick="switchChartTF('M5',this)">M5</button>
                 <button class="tf-btn" onclick="switchChartTF('M15',this)">M15</button>
                 <button class="tf-btn" onclick="switchChartTF('H1',this)">H1</button>
@@ -554,6 +554,7 @@ function startApp(){
   updateAcctDisplay();
   renderPerfMini();
   renderStats();
+  updateTFButtons();
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     initChart();
     runAnalysis();
@@ -1174,14 +1175,32 @@ function switchNav(nav){
   if(nav==='alertas') renderAlerts();
 }
 
+function updateTFButtons(){
+  const el = document.getElementById('tf-buttons');
+  if(!el) return;
+  if(curAsset === 'XAU/USD'){
+    // XAU: only M5
+    el.innerHTML = '<button class="tf-btn active" onclick="switchChartTF('M5',this)">M5</button>';
+  } else {
+    // BTC: M2, M5, M15, H1, 4H, 1D
+    el.innerHTML = `
+      <button class="tf-btn" onclick="switchChartTF('M2',this)">M2</button>
+      <button class="tf-btn active" onclick="switchChartTF('M5',this)">M5</button>
+      <button class="tf-btn" onclick="switchChartTF('M15',this)">M15</button>
+      <button class="tf-btn" onclick="switchChartTF('H1',this)">H1</button>
+      <button class="tf-btn" onclick="switchChartTF('4H',this)">4H</button>
+      <button class="tf-btn" onclick="switchChartTF('1D',this)">1D</button>`;
+  }
+}
+
 function switchAsset(asset){
   if(curAsset===asset) return;
   curAsset=asset;
   document.querySelectorAll('.asset-btn').forEach(e=>e.classList.remove('active'));
   document.getElementById('ab-'+asset.replace('/',''))?.classList.add('active');
+  updateTFButtons();
   const c=cache[asset];
   if(c){const sig=activeSignals[asset]||null;const mgmt=sig&&c.price?checkMgmt(sig,c.price,c.inds||[],c.tfResults||[]):null;renderOverview(sig,c.tfResults||[],c.inds||[],mgmt,c.price);}
-  // Small delay to avoid API burst
   setTimeout(()=>runAnalysis(), 500);
 }
 

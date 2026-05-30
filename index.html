@@ -726,43 +726,85 @@ function renderHistRecent(){renderHistRows('hist-recent','hist-recent-empty',5);
 function renderHistFull(){renderHistRows('hist-full','hist-full-empty',null);}
 
 // ─── API ──────────────────────────────────────
-// Binance interval map
 const BN_TF = {'2min':'1m','5min':'5m','15min':'15m','1h':'1h','4h':'4h','1day':'1d'};
+
+// Fetch with multiple fallback URLs for CORS
+async function fetchWithFallback(urls){
+  for(const url of urls){
+    try{
+      const r=await fetch(url,{mode:'cors'});
+      if(r.ok) return await r.json();
+    }catch(e){}
+  }
+  return null;
+}
 
 async function fetchCandlesBinance(interval, size=150){
   try{
-    const bnInterval = BN_TF[interval]||'5m';
-    const r=await fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${bnInterval}&limit=${size}`);
-    const d=await r.json();
-    if(!Array.isArray(d)) return null;
-    return d.map(v=>({
-      open:+v[1],high:+v[2],low:+v[3],close:+v[4],
-      datetime:new Date(v[0]).toISOString().slice(0,16).replace('T',' ')
-    }));
+    const bnInterval=BN_TF[interval]||'5m';
+    // Try Binance US (no CORS issues from browsers)
+    const urls=[
+      `https://api.binance.us/api/v3/klines?symbol=BTCUSD&interval=${bnInterval}&limit=${size}`,
+      `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${bnInterval}&limit=${size}`
+    ];
+    for(const url of urls){
+      try{
+        const r=await fetch(url);
+        const d=await r.json();
+        if(Array.isArray(d)&&d.length>0){
+          return d.map(v=>({
+            open:+v[1],high:+v[2],low:+v[3],close:+v[4],
+            datetime:new Date(+v[0]).toISOString().slice(0,16).replace('T',' ')
+          }));
+        }
+      }catch(e){}
+    }
+    return null;
   }catch{return null;}
 }
 
 async function fetchPriceBinance(){
   try{
-    const r=await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
-    const d=await r.json();
-    return d.price?+d.price:null;
+    const urls=[
+      'https://api.binance.us/api/v3/ticker/price?symbol=BTCUSD',
+      'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT'
+    ];
+    for(const url of urls){
+      try{
+        const r=await fetch(url);
+        const d=await r.json();
+        if(d.price) return +d.price;
+      }catch(e){}
+    }
+    return null;
   }catch{return null;}
 }
 
+// Cache for XAU to reduce Twelve Data calls
+const apiCache={};
 async function fetchCandles(sym,interval,size=150){
   if(sym==='BTC/USD') return fetchCandlesBinance(interval,size);
+  // XAU: use Twelve Data with per-interval cache (5min expiry)
+  const cacheKey=`${sym}_${interval}`;
+  const now=Date.now();
+  if(apiCache[cacheKey]&&(now-apiCache[cacheKey].t)<240000) return apiCache[cacheKey].d;
   try{
     const r=await fetch(`https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(sym)}&interval=${interval}&outputsize=${size}&apikey=${API}`);
     const d=await r.json();
     if(d.status==='error'||!d.values) return null;
-    return d.values.reverse().map(v=>({open:+v.open,high:+v.high,low:+v.low,close:+v.close,datetime:v.datetime}));
+    const candles=d.values.reverse().map(v=>({open:+v.open,high:+v.high,low:+v.low,close:+v.close,datetime:v.datetime}));
+    apiCache[cacheKey]={d:candles,t:now};
+    return candles;
   }catch{return null;}
 }
 
 async function fetchPrice(sym){
   if(sym==='BTC/USD') return fetchPriceBinance();
-  try{const r=await fetch(`https://api.twelvedata.com/price?symbol=${encodeURIComponent(sym)}&apikey=${API}`);const d=await r.json();return d.price?+d.price:null;}catch{return null;}
+  try{
+    const r=await fetch(`https://api.twelvedata.com/price?symbol=${encodeURIComponent(sym)}&apikey=${API}`);
+    const d=await r.json();
+    return d.price?+d.price:null;
+  }catch{return null;}
 }
 
 // ─── INDICATORS ───────────────────────────────
@@ -895,9 +937,17 @@ function showToast(type,asset,pnl,pips,price,sig){
 function generateSignal(tfResults,m5Candles){
   if(activeSignals[curAsset]) return null;
   const m15=tfResults.find(t=>t.key==='15min'),m5=tfResults.find(t=>t.key==='5min');
-  if(!m15||!m5) return null;
-  const isBull=['BUY','BULL'].includes(m15.sig)&&m5.sig==='BUY';
-  const isBear=['SELL','BEAR'].includes(m15.sig)&&m5.sig==='SELL';
+  if(!m5) return null;
+  let isBull,isBear;
+  if(m15){
+    // BTC: require M15 + M5 alignment
+    isBull=['BUY','BULL'].includes(m15.sig)&&m5.sig==='BUY';
+    isBear=['SELL','BEAR'].includes(m15.sig)&&m5.sig==='SELL';
+  } else {
+    // XAU: M5 only — need strong signal (BUY not just BULL)
+    isBull=m5.sig==='BUY';
+    isBear=m5.sig==='SELL';
+  }
   if(!isBull&&!isBear) return null;
   const atr=atrV(m5Candles),price=m5Candles[m5Candles.length-1].close,type=isBull?'BUY':'SELL';
   const dec=ASSETS[curAsset].dec;
@@ -1162,7 +1212,7 @@ async function runAnalysis(){
     // Smart cache: skip fetch if data is less than 4 minutes old (only for XAU - BTC is free)
     const now=Date.now();
     const cached=cache[curAsset];
-    if(sym!=='BTC/USD' && cached?.fetchTime && (now-cached.fetchTime)<240000 && cached.m5Candles){
+    if(sym!=='BTC/USD' && cached?.fetchTime && (now-cached.fetchTime)<180000 && cached.m5Candles){
       // Use cached data, just re-render
       const signal=activeSignals[curAsset]||null;
       const mgmt=signal&&cached.price?checkMgmt(signal,cached.price,cached.inds||[],cached.tfResults||[]):null;
@@ -1172,12 +1222,10 @@ async function runAnalysis(){
     }
     const m5=await fetchCandles(sym,'5min',150);
     if(!m5){
-      // Don't spam alerts - only add if last alert was more than 5 minutes ago
+      // Suppress repeated API alerts - max 1 per 10 minutes per asset
       const alerts=loadAlertsList();
-      const lastApiAlert=alerts.find(a=>a.msg.includes('API indisponível')&&a.asset===curAsset);
-      if(!lastApiAlert||alerts.indexOf(lastApiAlert)>2){
-        addAlert('warn',`Sem dados para ${curAsset} — API indisponível`);
-      }
+      const recent=alerts.slice(0,5).filter(a=>a.msg.includes('indisponível')&&a.asset===curAsset);
+      if(recent.length===0) addAlert('warn',`Sem dados para ${curAsset} — tentando novamente em 10min`);
       if(btn){btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-bolt"></i> ANALISAR AGORA';}
       resetTicker();return;
     }
@@ -1185,7 +1233,18 @@ async function runAnalysis(){
     document.getElementById('m-asset').textContent=curAsset;
     checkAutoClose(curAsset,price);
     const m5Inds=calcInds(m5);
-    const [h1,m15,m2]=await Promise.all([fetchCandles(sym,'1h',100),fetchCandles(sym,'15min',100),fetchCandles(sym,'2min',100)]);
+    // BTC: fetch all TFs via Binance (free). XAU: only M5 to save API calls
+    let h1,m15,m2;
+    if(sym==='BTC/USD'){
+      [h1,m15,m2]=await Promise.all([
+        fetchCandles(sym,'1h',100),
+        fetchCandles(sym,'15min',100),
+        fetchCandles(sym,'2min',100)
+      ]);
+    } else {
+      // XAU: only M5 — saves 3 API calls per cycle
+      h1=null; m15=null; m2=null;
+    }
     const tfResults=[
       {key:'1h',   label:'H1',  sig:tfSignal(h1),  inds:h1?calcInds(h1).slice(0,4):[]},
       {key:'15min',label:'M15', sig:tfSignal(m15), inds:m15?calcInds(m15).slice(0,4):[]},
@@ -1229,7 +1288,7 @@ async function monitorPrices(){
 }
 
 function resetTicker(){
-  ticker=600;clearInterval(tickInt);
+  ticker=300;clearInterval(tickInt);
   tickInt=setInterval(()=>{ticker--;if(ticker<=0){runAnalysis();return;}const m=Math.floor(ticker/60).toString().padStart(2,'0'),s=(ticker%60).toString().padStart(2,'0');document.getElementById('countdown').textContent=m+':'+s;},1000);
 }
 </script>

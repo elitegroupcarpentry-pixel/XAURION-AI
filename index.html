@@ -345,153 +345,142 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
       <!-- ── VISÃO GERAL ── -->
       <div class="panel active" id="panel-overview">
-        <!-- TOP ROW -->
-        <div class="ov-top">
-          <!-- Signal Card -->
-          <div class="card sig-main">
+
+        <!-- ROW 1: Signal + Confluência -->
+        <div style="display:grid;grid-template-columns:1fr 280px;gap:8px;margin-bottom:8px">
+          <!-- Signal Main -->
+          <div class="card" style="position:relative;overflow:hidden;min-height:130px">
+            <div style="position:absolute;right:-10px;top:-10px;font-size:90px;opacity:0.06;pointer-events:none" id="sig-bg-ico">📈</div>
             <div class="sig-wait-lbl">SINAL ATIVO</div>
             <div id="sig-card-inner">
               <div class="sig-big sig-wait-big"><i class="fa-solid fa-satellite-dish" style="font-size:20px;margin-right:8px"></i>MONITORANDO</div>
-              <div class="sig-conf-row"><span class="sig-conf-lbl">Aguardando confluência M15 + M5...</span></div>
+              <div class="sig-conf-row"><span class="sig-conf-lbl">Aguardando M15 + M5 alinhados...</span></div>
+            </div>
+            <!-- Asset / TF / Tendência / Status row -->
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px">
+              <div><div class="sig-wait-lbl">ATIVO</div><div style="font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:700;color:var(--gold)" id="ib-asset">XAU/USD</div></div>
+              <div><div class="sig-wait-lbl">TIMEFRAME</div><div style="font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:700;color:var(--cyan)" id="ib-tf">M5</div></div>
+              <div><div class="sig-wait-lbl">TENDÊNCIA</div><div style="font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:700" id="ib-trend">—</div></div>
+              <div><div class="sig-wait-lbl">STATUS</div><div style="font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:700;color:var(--muted)" id="ib-status">AGUARDANDO</div></div>
             </div>
           </div>
-          <!-- Tendência -->
+          <!-- Confluência Score -->
           <div class="card">
-            <div class="card-title">TENDÊNCIA</div>
-            <div class="tf-row" id="tf-row">
-              <div class="tf-item"><div class="tf-lbl">H1</div><div class="tf-dir">—</div><span class="tf-arrow">—</span></div>
-              <div class="tf-item"><div class="tf-lbl">M15</div><div class="tf-dir">—</div><span class="tf-arrow">—</span></div>
-              <div class="tf-item"><div class="tf-lbl">M5</div><div class="tf-dir">—</div><span class="tf-arrow">—</span></div>
+            <div class="card-title">CONFLUÊNCIA (SCORE)</div>
+            <div class="score-wrap">
+              <div class="score-svg-wrap">
+                <svg width="72" height="72" viewBox="0 0 72 72" id="score-svg">
+                  <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="7"/>
+                  <circle cx="36" cy="36" r="28" fill="none" stroke="#3A5568" stroke-width="7" stroke-dasharray="175.9" stroke-dashoffset="0" transform="rotate(-90 36 36)" id="score-circle"/>
+                  <text x="36" y="40" text-anchor="middle" fill="var(--text)" font-size="16" font-weight="700" font-family="Orbitron,monospace" id="score-num">—</text>
+                </svg>
+              </div>
+              <div class="score-list" id="score-list">
+                <div class="score-item"><span class="score-check neu">○</span><span class="score-name">EMA 8/21</span><span class="score-sig neu">—</span></div>
+                <div class="score-item"><span class="score-check neu">○</span><span class="score-name">MACD</span><span class="score-sig neu">—</span></div>
+                <div class="score-item"><span class="score-check neu">○</span><span class="score-name">RSI</span><span class="score-sig neu">—</span></div>
+                <div class="score-item"><span class="score-check neu">○</span><span class="score-name">BOLLINGER</span><span class="score-sig neu">—</span></div>
+                <div class="score-item"><span class="score-check neu">○</span><span class="score-name">ADX</span><span class="score-sig neu">—</span></div>
+              </div>
             </div>
-          </div>
-          <!-- Market State -->
-          <div class="card" style="text-align:center">
-            <div class="card-title">ESTADO DO MERCADO</div>
-            <div class="mkt-animal" id="mkt-ico">📊</div>
-            <div class="mkt-state" id="mkt-state">—</div>
-            <div class="mkt-vol-row"><span class="mkt-vol-lbl">VOLATILIDADE</span><span class="mkt-vol-val" id="mkt-vol">—</span></div>
-            <div class="mkt-vol-row" style="margin-top:4px"><span class="mkt-vol-lbl">PREÇO</span><span class="mkt-vol-val" id="mkt-price" style="color:var(--gold)">—</span></div>
           </div>
         </div>
 
-        <!-- INFO BAR -->
-        <div class="ov-infobar">
-          <div class="ib-box asset"><div class="ib-lbl">ATIVO</div><div class="ib-val" id="ib-asset">XAU/USD</div></div>
+        <!-- ROW 2: Levels info bar -->
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:8px">
           <div class="ib-box ent"><div class="ib-lbl">ENTRADA</div><div class="ib-val" id="ib-entry">—</div></div>
           <div class="ib-box sl"><div class="ib-lbl">STOP LOSS</div><div class="ib-val" id="ib-sl">—</div></div>
           <div class="ib-box tp"><div class="ib-lbl">TAKE PROFIT</div><div class="ib-val" id="ib-tp">—</div></div>
           <div class="ib-box rr"><div class="ib-lbl">RISCO/RETORNO</div><div class="ib-val" id="ib-rr">—</div></div>
-          <div class="ib-box"><div class="ib-lbl">TIMEFRAME</div><div class="ib-val" id="ib-tf" style="color:var(--cyan)">M5</div></div>
-          <div class="ib-box status closed" id="ib-status-box"><div class="ib-lbl">STATUS</div><div class="ib-val" id="ib-status">AGUARDANDO</div></div>
+          <div class="ib-box" style="border-color:rgba(0,245,255,0.2)"><div class="ib-lbl">PIPS ATUAIS</div><div class="ib-val" id="ib-pips" style="color:var(--cyan)">—</div></div>
+          <div class="ib-box" style="border-color:rgba(255,215,0,0.2)"><div class="ib-lbl">PROGRESSO</div><div class="ib-val" id="ib-prog" style="color:var(--gold)">—</div></div>
         </div>
 
-        <!-- MIDDLE -->
-        <div class="ov-middle">
-          <div class="ov-left">
-            <!-- Position Bar -->
-            <div class="card" id="pos-card">
-              <div class="card-title">POSIÇÃO ATUAL</div>
-              <div id="pos-content">
-                <div class="monitor-badge"><div class="mon-dot"></div>Monitorando mercado — sem operação aberta</div>
-              </div>
-            </div>
-            <!-- Chart -->
-            <div class="card" style="padding:10px">
-              <div class="chart-container"><div id="tv-chart"></div></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;flex-wrap:wrap;gap:4px">
-                <div class="tf-selector" id="tf-selector">
-                  <button class="tf-btn" onclick="switchChartTF('M2',this)">M2</button>
-                  <button class="tf-btn active" onclick="switchChartTF('M5',this)">M5</button>
-                  <button class="tf-btn" onclick="switchChartTF('M15',this)">M15</button>
-                  <button class="tf-btn" onclick="switchChartTF('H1',this)">H1</button>
-                  <button class="tf-btn" onclick="switchChartTF('4H',this)">4H</button>
-                  <button class="tf-btn" onclick="switchChartTF('1D',this)">1D</button>
-                </div>
-                <div class="ema-toggles">
-                  <button class="ema-btn e8 on" onclick="toggleEMA(8,this)">EMA 8</button>
-                  <button class="ema-btn e20 on" onclick="toggleEMA(20,this)">EMA 20</button>
-                  <button class="ema-btn e200 on" onclick="toggleEMA(200,this)">EMA 200</button>
-                </div>
-              </div>
-            </div>
-            <!-- Below chart: perf + gestao side by side -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-              <!-- Mini Performance -->
-              <div class="card">
-                <div class="card-title">PERFORMANCE</div>
-                <div class="perf-period-tabs">
-                  <div class="pp-tab active" onclick="switchPerfTab('today',this)">HOJE</div>
-                  <div class="pp-tab" onclick="switchPerfTab('week',this)">SEM</div>
-                  <div class="pp-tab" onclick="switchPerfTab('month',this)">MÊS</div>
-                  <div class="pp-tab" onclick="switchPerfTab('all',this)">TOTAL</div>
-                </div>
-                <div id="perf-rows"></div>
-              </div>
-              <!-- Mini Gestao conta -->
-              <div class="card">
-                <div class="card-title">GESTÃO DA CONTA</div>
-                <div class="go-row"><span class="go-lbl">SALDO</span><span class="go-val" id="gc-bal" style="color:var(--gold)">—</span></div>
-                <div class="go-row"><span class="go-lbl">RISCO/TRADE</span><span class="go-val" id="gc-risk" style="color:var(--red)">—</span></div>
-                <div class="go-row"><span class="go-lbl">LOTE SUGERIDO</span><span class="go-val" id="gc-lot" style="color:var(--cyan)">—</span></div>
-                <div class="go-row"><span class="go-lbl">DRAWDOWN DIA</span><span class="go-val" id="gc-dd" style="color:var(--orange)">—</span></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="ov-right">
-            <!-- Confluência Score -->
-            <div class="card">
-              <div class="card-title">CONFLUÊNCIA (SCORE)</div>
-              <div class="score-wrap">
-                <div class="score-svg-wrap">
-                  <svg width="72" height="72" viewBox="0 0 72 72" id="score-svg">
-                    <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="7"/>
-                    <circle cx="36" cy="36" r="28" fill="none" stroke="#3A5568" stroke-width="7" stroke-dasharray="175.9" stroke-dashoffset="0" transform="rotate(-90 36 36)" id="score-circle"/>
-                    <text x="36" y="40" text-anchor="middle" fill="var(--text)" font-size="16" font-weight="700" font-family="Orbitron,monospace" id="score-num">—</text>
-                  </svg>
-                </div>
-                <div class="score-list" id="score-list">
-                  <div class="score-item"><span class="score-check neu">○</span><span class="score-name">EMA 8/21</span><span class="score-sig neu">—</span></div>
-                  <div class="score-item"><span class="score-check neu">○</span><span class="score-name">STOCH RSI</span><span class="score-sig neu">—</span></div>
-                  <div class="score-item"><span class="score-check neu">○</span><span class="score-name">MACD HIST</span><span class="score-sig neu">—</span></div>
-                  <div class="score-item"><span class="score-check neu">○</span><span class="score-name">ADX</span><span class="score-sig neu">—</span></div>
-                  <div class="score-item"><span class="score-check neu">○</span><span class="score-name">BOLLINGER</span><span class="score-sig neu">—</span></div>
-                </div>
-              </div>
-            </div>
-            <!-- Gestão da Operação -->
-            <div class="card">
-              <div class="card-title">GESTÃO DA OPERAÇÃO</div>
-              <div id="go-panel">
-                <div class="go-row"><span class="go-lbl">BREAKEVEN</span><span class="go-val off" id="go-be">INATIVO</span></div>
-                <div class="go-row"><span class="go-lbl">PARCIAL</span><span class="go-val off" id="go-parc">—</span></div>
-                <div class="go-row"><span class="go-lbl">STOP PROT.</span><span class="go-val off" id="go-stop">—</span></div>
-                <div id="go-action-wrap"></div>
-              </div>
-            </div>
-
+        <!-- ROW 3: Position bar -->
+        <div class="card" style="padding:10px 14px;margin-bottom:8px" id="pos-card">
+          <div id="pos-content">
+            <div class="monitor-badge"><div class="mon-dot"></div>Monitorando mercado — sem operação aberta</div>
           </div>
         </div>
 
-        <!-- HISTORY RECENT -->
-        <div class="card">
-          <div class="card-title">HISTÓRICO RECENTE</div>
-          <div style="overflow-x:auto">
-            <table class="hist-table">
-              <thead><tr>
-                <th>HORÁRIO</th><th>ATIVO</th><th>TF</th><th>SINAL</th>
-                <th>ENTRADA</th><th>SAÍDA</th><th>RESULTADO</th><th>PIPS</th><th>R/R</th><th>STATUS</th>
-              </tr></thead>
-              <tbody id="hist-body-recent"></tbody>
-            </table>
-            <div id="hist-empty-recent" class="no-data">Nenhuma operação ainda</div>
+        <!-- ROW 4: Chart + Analyst -->
+        <div style="display:grid;grid-template-columns:1fr 220px;gap:8px;margin-bottom:8px">
+          <div class="card" style="padding:10px">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:1px">GRÁFICO <span id="chart-lbl" style="color:var(--cyan)">XAU/USD</span> · M5</div>
+            <div class="chart-container"><div id="tv-chart"></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;flex-wrap:wrap;gap:4px">
+              <div class="tf-selector" id="tf-selector">
+                <button class="tf-btn" onclick="switchChartTF('M2',this)">M2</button>
+                <button class="tf-btn active" onclick="switchChartTF('M5',this)">M5</button>
+                <button class="tf-btn" onclick="switchChartTF('M15',this)">M15</button>
+                <button class="tf-btn" onclick="switchChartTF('H1',this)">H1</button>
+                <button class="tf-btn" onclick="switchChartTF('4H',this)">4H</button>
+                <button class="tf-btn" onclick="switchChartTF('1D',this)">1D</button>
+              </div>
+              <div class="ema-toggles">
+                <button class="ema-btn e8 on" onclick="toggleEMA(8,this)">EMA 8</button>
+                <button class="ema-btn e20 on" onclick="toggleEMA(20,this)">EMA 20</button>
+                <button class="ema-btn e200 on" onclick="toggleEMA(200,this)">EMA 200</button>
+              </div>
+            </div>
+          </div>
+          <!-- AI Analyst -->
+          <div class="card" style="display:flex;flex-direction:column">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+              <i class="fa-solid fa-robot" style="color:var(--cyan);font-size:13px"></i>
+              <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--cyan);letter-spacing:1px">XAURION AI ANALYST</span>
+              <span style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);border:1px solid var(--border);padding:1px 5px;border-radius:2px">BETA</span>
+            </div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">ANÁLISE ATUAL</div>
+            <div id="analyst-txt" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text);line-height:1.7;flex:1;opacity:0.9">Aguardando análise...</div>
+            <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:4px">RECOMENDAÇÃO</div>
+              <div id="analyst-rec" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--gold);line-height:1.6">—</div>
+            </div>
+            <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:6px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted)">RISCO</span>
+              <span id="analyst-risk" style="font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;color:var(--gold)">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 5: Performance + Gestão operação + Histórico recente -->
+        <div style="display:grid;grid-template-columns:200px 200px 1fr;gap:8px;margin-bottom:8px">
+          <!-- Performance -->
+          <div class="card">
+            <div class="card-title">PERFORMANCE DO DIA</div>
+            <div id="perf-mini"></div>
+          </div>
+          <!-- Gestão Operação -->
+          <div class="card">
+            <div class="card-title">GESTÃO DA OPERAÇÃO</div>
+            <div id="go-panel">
+              <div class="go-row"><span class="go-lbl">BREAKEVEN</span><span class="go-val off" id="go-be">INATIVO</span></div>
+              <div class="go-row"><span class="go-lbl">PARCIAL</span><span class="go-val off" id="go-parc">—</span></div>
+              <div class="go-row"><span class="go-lbl">STOP PROT.</span><span class="go-val off" id="go-stop">NÃO</span></div>
+              <div class="go-row"><span class="go-lbl">PRÓXIMA AÇÃO</span><span class="go-val warn" id="go-next" style="font-size:10px">MANTER</span></div>
+            </div>
+          </div>
+          <!-- Histórico recente -->
+          <div class="card">
+            <div class="card-title">HISTÓRICO RECENTE</div>
+            <div style="overflow-x:auto">
+              <table class="hist-table">
+                <thead><tr>
+                  <th>HORA</th><th>ATIVO</th><th>TF</th><th>SINAL</th>
+                  <th>ENTRADA</th><th>RESULTADO</th><th>PIPS</th><th>STATUS</th>
+                </tr></thead>
+                <tbody id="hist-body-recent"></tbody>
+              </table>
+              <div id="hist-empty-recent" class="no-data">Nenhuma operação ainda</div>
+            </div>
           </div>
         </div>
 
         <button class="btn-analyze" id="btn-analyze" onclick="runAnalysis()">⚡ ANALISAR AGORA</button>
       </div>
 
-      <!-- ── GESTÃO ── -->
+<!-- ── GESTÃO ── -->
       <div class="panel" id="panel-gestao">
         <div class="card">
           <div class="card-title">CONFIGURAÇÃO DE CONTA</div>
@@ -1032,10 +1021,10 @@ function calcProbability(tfResults, inds, signal){
 function checkManagement(signal, price, inds, tfResults){
   if(!signal) return null;
   const isBuy=signal.type==='BUY';
+  const dec=ASSETS[signal.asset]?.dec||2;
   const total=Math.abs(signal.tp-signal.entry);
   const moved=isBuy?price-signal.entry:signal.entry-price;
   const progress=moved/(total||1);
-  if(progress<=0.3) return null;
   const m5=tfResults.find(t=>t.key==='5min');
   const macd=inds.find(i=>i.name==='MACD HIST');
   const sr=inds.find(i=>i.name==='STOCH RSI');
@@ -1045,11 +1034,28 @@ function checkManagement(signal, price, inds, tfResults){
   const srV=parseFloat(sr?.val||50);
   const srExt=(isBuy&&srV>78)||((!isBuy)&&srV<22);
   const weak=[macdWeak,m5Weak,srExt].filter(Boolean).length;
-  const pct=Math.round(progress*100);
-  if(progress>=0.65&&weak>=2) return { type:'red-a',msg:'⚠️ FECHAR OPERAÇÃO',desc:`Preço andou ${pct}% até o TP e ${weak} indicadores revertendo.` };
-  if(progress>=0.5&&weak>=1)  return { type:'orange',msg:'🟠 PARCIAL SUGERIDA',desc:`${pct}% do caminho. Indicador enfraquecendo — realize 50%.` };
-  if(progress>=0.4)           return { type:'yellow',msg:'🟡 BREAKEVEN',desc:`${pct}% do caminho. Mova o SL para ${signal.entry.toFixed(ASSETS[curAsset]?.dec||2)}.` };
-  return null;
+  const pct=Math.round(Math.max(0,progress)*100);
+
+  // Determine current level based on price progress
+  let currentLevel = 0;
+  if(progress>=0.65&&weak>=2) currentLevel=3;
+  else if(progress>=0.5&&weak>=1) currentLevel=2;
+  else if(progress>=0.4) currentLevel=1;
+
+  // STICKY: never downgrade — use signal's stored max level
+  const storedLevel = signal.mgmtLevel||0;
+  const effectiveLevel = Math.max(currentLevel, storedLevel);
+
+  // Store the highest level reached
+  if(effectiveLevel > storedLevel){
+    signal.mgmtLevel = effectiveLevel;
+    saveActiveSignals();
+  }
+
+  if(effectiveLevel===0) return null;
+  if(effectiveLevel===3) return { type:'red-a', msg:'⚠️ FECHAR OPERAÇÃO', desc:`Progresso máx. atingido com ${weak} indicadores revertendo. Realize lucro.` };
+  if(effectiveLevel===2) return { type:'orange', msg:'🟠 PARCIAL SUGERIDA', desc:`50% do caminho atingido. Considere realizar parcial.` };
+  return { type:'yellow', msg:'🟡 BREAKEVEN ATIVO', desc:`Mova o SL para ${signal.entry.toFixed(dec)} para proteger capital.` };
 }
 
 function checkAutoClose(asset, price){
@@ -1208,158 +1214,131 @@ function toggleEMA(period, btn){
 // ═══════════════════════════════════════════
 function renderOverviewSignal(signal, tfResults, inds, mgmt, currentPrice){
   const dec=ASSETS[curAsset]?.dec||2;
-
-  // Signal card
+  const isBuy=signal?.type==='BUY';
   const sigInner=document.getElementById('sig-card-inner');
-  
+
   if(!signal){
-    sigInner.innerHTML=`<div class="sig-big sig-wait-big"><i class="fa-solid fa-satellite-dish" style="font-size:22px;margin-right:8px"></i>MONITORANDO</div>
-      <div class="sig-conf-row"><span class="sig-conf-lbl">Aguardando M15 + M5 alinhados...</span></div>`;
+    sigInner.innerHTML=`<div class="sig-big sig-wait-big"><i class="fa-solid fa-satellite-dish" style="font-size:20px;margin-right:8px"></i>MONITORANDO</div><div class="sig-conf-row"><span class="sig-conf-lbl">Aguardando M15 + M5 alinhados...</span></div>`;
+    document.getElementById('ib-status').textContent='AGUARDANDO'; document.getElementById('ib-status').style.color='var(--muted)';
+    document.getElementById('ib-trend').textContent='—'; document.getElementById('ib-trend').style.color='var(--muted)';
+    ['ib-entry','ib-sl','ib-tp','ib-rr','ib-pips','ib-prog'].forEach(id=>document.getElementById(id).textContent='—');
   } else {
-    const isBuy=signal.type==='BUY', cls=isBuy?'sig-buy':'sig-sell';
     const prob=calcProbability(tfResults,inds,signal);
     const pCls=prob>=70?'var(--green)':prob>=50?'var(--gold)':'var(--red)';
-    sigInner.innerHTML=`
-      <div class="sig-big ${cls}">${isBuy?'▲ COMPRA':'▼ VENDA'} <i class="fa-solid ${isBuy?'fa-arrow-trend-up':'fa-arrow-trend-down'}" style="font-size:22px"></i></div>
-      <div class="sig-conf-row">
-        <span class="sig-conf-lbl">CONFIANÇA</span>
-        <span class="sig-conf-val" style="color:${pCls};font-family:'Orbitron',monospace;font-size:22px;font-weight:900;margin-left:8px">${prob}%</span>
-      </div>
-      <div style="height:4px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:6px;overflow:hidden">
-        <div style="width:${prob}%;height:100%;background:${pCls};border-radius:2px;transition:width 0.8s ease"></div>
-      </div>`;
-  }
-
-  // Info bar
-  if(signal){
-    const rr=Math.abs(signal.tp-signal.entry)/Math.abs(signal.sl-signal.entry);
+    const rr=(Math.abs(signal.tp-signal.entry)/Math.abs(signal.sl-signal.entry)).toFixed(2);
+    const total=Math.abs(signal.tp-signal.entry);
+    const moved=isBuy?(currentPrice||signal.entry)-signal.entry:signal.entry-(currentPrice||signal.entry);
+    const progress=Math.max(0,Math.min(1,moved/total));
+    const pct=Math.round(progress*100);
+    const pips=currentPrice?calcPips(curAsset,signal.entry,currentPrice,signal.type):0;
+    const pipsColor=pips>=0?'var(--green)':'var(--red)';
+    sigInner.innerHTML=`<div class="sig-big ${isBuy?'sig-buy':'sig-sell'}">${isBuy?'▲ COMPRA':'▼ VENDA'} <i class="fa-solid ${isBuy?'fa-arrow-trend-up':'fa-arrow-trend-down'}" style="font-size:20px"></i></div>
+      <div class="sig-conf-row" style="margin-top:6px"><span class="sig-conf-lbl">CONFIANÇA</span><span style="font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:${pCls};margin-left:10px">${prob}%</span></div>
+      <div style="height:4px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:6px;overflow:hidden"><div style="width:${prob}%;height:100%;background:${pCls};border-radius:2px;transition:width 0.8s ease"></div></div>`;
+    const m5sig=tfResults.find(t=>t.key==='5min')?.sig||'NEUTRAL';
+    const trendTxt=['BUY','BULL'].includes(m5sig)?'ALTA':['SELL','BEAR'].includes(m5sig)?'BAIXA':'LATERAL';
+    const trendColor=['BUY','BULL'].includes(m5sig)?'var(--green)':['SELL','BEAR'].includes(m5sig)?'var(--red)':'var(--muted)';
+    document.getElementById('ib-trend').textContent=trendTxt; document.getElementById('ib-trend').style.color=trendColor;
+    document.getElementById('ib-status').textContent='EM ABERTO'; document.getElementById('ib-status').style.color='var(--green)';
     document.getElementById('ib-entry').textContent=signal.entry.toFixed(dec);
     document.getElementById('ib-sl').textContent=signal.sl.toFixed(dec);
     document.getElementById('ib-tp').textContent=signal.tp.toFixed(dec);
-    document.getElementById('ib-rr').textContent='1:'+rr.toFixed(2);
-    document.getElementById('ib-tf').textContent=signal.timeframe;
-    document.getElementById('ib-status').textContent='EM ABERTO';
-    document.getElementById('ib-status-box').className='ib-box status';
-  } else {
-    ['ib-entry','ib-sl','ib-tp','ib-rr'].forEach(id=>document.getElementById(id).textContent='—');
-    document.getElementById('ib-status').textContent='AGUARDANDO';
-    document.getElementById('ib-status-box').className='ib-box status closed';
+    document.getElementById('ib-rr').textContent='1:'+rr;
+    document.getElementById('ib-pips').textContent=(pips>=0?'+':'')+pips.toFixed(0);
+    document.getElementById('ib-pips').style.color=pipsColor;
+    document.getElementById('ib-prog').textContent=pct+'%';
   }
 
   // Position bar
-  const posCard=document.getElementById('pos-content');
-  if(signal && currentPrice){
-    const isBuy=signal.type==='BUY';
+  const posContent=document.getElementById('pos-content');
+  if(signal&&currentPrice){
     const total=Math.abs(signal.tp-signal.entry);
-    const moved=Math.max(0,isBuy?currentPrice-signal.entry:signal.entry-currentPrice);
-    const progress=Math.min(1,moved/total);
+    const moved=isBuy?currentPrice-signal.entry:signal.entry-currentPrice;
+    const progress=Math.max(0,Math.min(1,moved/total));
     const pct=Math.round(progress*100);
     const barColor=pct>=65?'var(--green)':pct>=40?'var(--gold)':'var(--cyan)';
-    // Dot position relative to SL→TP range
     const range=Math.abs(signal.tp-signal.sl);
     const dotPct=isBuy?((currentPrice-signal.sl)/range)*100:((signal.sl-currentPrice)/range)*100;
     const dotLeft=Math.max(2,Math.min(98,dotPct));
-    let mgmtHtml='';
-    if(mgmt) mgmtHtml=`<div class="mgmt-alert ${mgmt.type}"><div class="mgmt-title">${mgmt.msg}</div>${mgmt.desc}</div>`;
-    posCard.innerHTML=`${mgmtHtml}
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <span class="pos-lbl sl">SL ${signal.sl.toFixed(dec)}</span>
-        <span class="pos-lbl ent">ENTRADA ${signal.entry.toFixed(dec)}</span>
-        <span class="pos-lbl tp">TP ${signal.tp.toFixed(dec)}</span>
+    posContent.innerHTML=`
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--red)">SL ${signal.sl.toFixed(dec)}</span>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan)">ENTRADA ${signal.entry.toFixed(dec)}</span>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--green)">TP ${signal.tp.toFixed(dec)}</span>
       </div>
-      <div class="pos-bar-track" style="background:linear-gradient(90deg,rgba(255,45,85,0.15),rgba(0,245,255,0.05),rgba(0,255,136,0.15))">
-        <div class="pos-dot" style="left:${dotLeft}%;background:${barColor};box-shadow:0 0 8px ${barColor}"></div>
+      <div style="height:10px;background:linear-gradient(90deg,rgba(255,45,85,0.2),rgba(0,245,255,0.05),rgba(0,255,136,0.2));border-radius:5px;position:relative">
+        <div style="position:absolute;top:50%;left:${dotLeft}%;width:14px;height:14px;background:${barColor};border-radius:50%;transform:translate(-50%,-50%);border:2px solid var(--bg);box-shadow:0 0 8px ${barColor};z-index:2;transition:left 0.5s ease"></div>
       </div>
-      <div class="pos-pct">Progresso: <span style="color:${barColor}">${pct}%</span> até o TP · Preço atual: <span style="color:var(--gold)">${currentPrice.toFixed(dec)}</span></div>`;
+      <div style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);margin-top:5px">
+        Progresso: <span style="color:${barColor};font-weight:700">${pct}%</span> até o TP · Preço atual: <span style="color:var(--gold)">${currentPrice.toFixed(dec)}</span>
+      </div>`;
   } else {
-    posCard.innerHTML=`<div class="monitor-badge"><div class="mon-dot"></div>Monitorando mercado — sem operação aberta</div>`;
+    posContent.innerHTML=`<div class="monitor-badge"><div class="mon-dot"></div>Monitorando mercado — sem operação aberta</div>`;
   }
 
-  // MTF tendência
-  const tfDisplay=[
-    tfResults.find(t=>t.key==='1h'),
-    tfResults.find(t=>t.key==='15min'),
-    tfResults.find(t=>t.key==='5min')
-  ];
-  const labels={ BUY:'ALTA',SELL:'BAIXA',BULL:'ALTA',BEAR:'BAIXA',NEUTRAL:'NEUTRO' };
-  const arrows={ BUY:'↗',SELL:'↘',BULL:'↗',BEAR:'↘',NEUTRAL:'→' };
-  const tfNames=['H1','M15','M5'];
-  document.getElementById('tf-row').innerHTML=tfDisplay.map((tf,i)=>{
-    const isBull=['BUY','BULL'].includes(tf?.sig), isBear=['SELL','BEAR'].includes(tf?.sig);
-    const cls=isBull?'bull':isBear?'bear':'';
-    return `<div class="tf-item ${cls}">
-      <div class="tf-lbl">${tfNames[i]}</div>
-      <div class="tf-dir">${labels[tf?.sig||'NEUTRAL']||'—'}</div>
-      <span class="tf-arrow">${arrows[tf?.sig||'NEUTRAL']||'—'}</span>
-    </div>`;
-  }).join('');
-
-  // Market state
-  const m5Adx=inds.find(i=>i.name==='ADX');
-  const adxV=parseFloat(m5Adx?.val||0);
-  const m5sig=tfResults.find(t=>t.key==='5min')?.sig||'NEUTRAL';
-  let mktState,mktCls,mktIco;
-  if(adxV>=25){ mktState='TREND FORTE'; mktCls='trend'; mktIco=['BUY','BULL'].includes(m5sig)?'<i class="fa-solid fa-arrow-trend-up" style="color:var(--green)"></i>':'<i class="fa-solid fa-arrow-trend-down" style="color:var(--red)"></i>'; }
-  else if(adxV>=18){ mktState='EM TENDÊNCIA'; mktCls='trend'; mktIco=['BUY','BULL'].includes(m5sig)?'<i class="fa-solid fa-arrow-trend-up" style="color:var(--green)"></i>':'<i class="fa-solid fa-arrow-trend-down" style="color:var(--red)"></i>'; }
-  else{ mktState='RANGING'; mktCls='ranging'; mktIco='<i class="fa-solid fa-arrows-left-right" style="color:var(--gold)"></i>'; }
-  document.getElementById('mkt-ico').innerHTML=mktIco;
-  document.getElementById('mkt-state').textContent=mktState;
-  document.getElementById('mkt-state').className='mkt-state '+mktCls;
-  const atr=cache[curAsset]?.atr||0;
-  const price2=currentPrice||0;
-  const volPct=price2>0?(atr/price2)*100:0;
-  const volLabel=volPct>0.3?'ALTA':volPct>0.15?'MODERADA':'BAIXA';
-  const volColor=volPct>0.3?'var(--red)':volPct>0.15?'var(--gold)':'var(--green)';
-  document.getElementById('mkt-vol').textContent=volLabel;
-  document.getElementById('mkt-vol').style.color=volColor;
-  if(currentPrice) document.getElementById('mkt-price').textContent=currentPrice.toFixed(ASSETS[curAsset]?.dec||2);
-
   // Score
-  const scoreEl=document.getElementById('score-num');
-  const circleEl=document.getElementById('score-circle');
-  const scoreList=document.getElementById('score-list');
-  if(!signal){ scoreEl.textContent='—'; circleEl.setAttribute('stroke','#3A5568'); circleEl.setAttribute('stroke-dashoffset','0');
-    scoreList.innerHTML=inds.map(ind=>{
-      const cls=ind.sig==='BUY'?'buy':ind.sig==='SELL'?'sell':'neu';
-      const check=ind.sig==='BUY'?'✓':ind.sig==='SELL'?'✗':'○';
-      const checkCls=ind.sig==='BUY'?'ok':ind.sig==='SELL'?'fail':'neu';
-      return `<div class="score-item"><span class="score-check ${checkCls}">${check}</span><span class="score-name">${ind.name}</span><span class="score-sig ${cls}">${ind.sig}</span></div>`;
-    }).join('');
+  const scoreEl=document.getElementById('score-num'), circleEl=document.getElementById('score-circle'), scoreList=document.getElementById('score-list');
+  const indNames=['EMA 8/21','MACD HIST','STOCH RSI','BOLLINGER','ADX'];
+  const displayInds=indNames.map(n=>inds.find(i=>i.name===n)||{name:n,sig:'NEUTRAL',val:'—'});
+  if(!signal){
+    scoreEl.textContent='—'; circleEl.setAttribute('stroke','#3A5568'); circleEl.setAttribute('stroke-dashoffset','0');
+    scoreList.innerHTML=displayInds.map(ind=>{const cls=ind.sig==='BUY'?'buy':ind.sig==='SELL'?'sell':'neu';const check=ind.sig==='BUY'?'✓':ind.sig==='SELL'?'✗':'○';const checkCls=ind.sig==='BUY'?'ok':ind.sig==='SELL'?'fail':'neu';return `<div class="score-item"><span class="score-check ${checkCls}">${check}</span><span class="score-name">${ind.name.replace(' HIST','').replace('STOCH ','')}</span><span class="score-sig ${cls}">${ind.sig}</span></div>`;}).join('');
   } else {
     const prob=calcProbability(tfResults,inds,signal);
-    const circum=175.9, offset=circum*(1-prob/100);
-    const scoreColor=prob>=70?'#00FF88':prob>=50?'#FFD700':'#FF2D55';
-    scoreEl.textContent=prob;
-    circleEl.setAttribute('stroke',scoreColor);
-    circleEl.setAttribute('stroke-dashoffset',offset.toFixed(1));
-    scoreList.innerHTML=inds.map(ind=>{
-      const matches=ind.sig===signal.type;
-      const cls=ind.sig==='BUY'?'buy':ind.sig==='SELL'?'sell':'neu';
-      const check=matches?'✓':ind.sig==='NEUTRAL'?'○':'✗';
-      const checkCls=matches?'ok':ind.sig==='NEUTRAL'?'neu':'fail';
-      return `<div class="score-item"><span class="score-check ${checkCls}">${check}</span><span class="score-name">${ind.name}</span><span class="score-sig ${cls}">${ind.sig}</span></div>`;
-    }).join('');
+    const circum=175.9,offset=circum*(1-prob/100),scoreColor=prob>=70?'#00FF88':prob>=50?'#FFD700':'#FF2D55';
+    scoreEl.textContent=prob; circleEl.setAttribute('stroke',scoreColor); circleEl.setAttribute('stroke-dashoffset',offset.toFixed(1));
+    scoreList.innerHTML=displayInds.map(ind=>{const matches=ind.sig===signal.type;const cls=ind.sig==='BUY'?'buy':ind.sig==='SELL'?'sell':'neu';const check=matches?'✓':ind.sig==='NEUTRAL'?'○':'✗';const checkCls=matches?'ok':ind.sig==='NEUTRAL'?'neu':'fail';return `<div class="score-item"><span class="score-check ${checkCls}">${check}</span><span class="score-name">${ind.name.replace(' HIST','').replace('STOCH ','')}</span><span class="score-sig ${cls}">${ind.sig}</span></div>`;}).join('');
   }
 
   // Gestão operação
-  if(signal && mgmt){
-    const beActive=mgmt&&['yellow','orange','red-a'].includes(mgmt.type);
-    const parcActive=mgmt&&['orange','red-a'].includes(mgmt.type);
-    const stopVal=signal.entry.toFixed(dec);
-    document.getElementById('go-be').textContent=beActive?'ATIVADO':'INATIVO';
-    document.getElementById('go-be').className='go-val '+(beActive?'on':'off');
-    document.getElementById('go-parc').textContent=parcActive?'50% SUGERIDA':'—';
-    document.getElementById('go-parc').className='go-val '+(parcActive?'warn':'off');
-    document.getElementById('go-stop').textContent=beActive?stopVal:'—';
-    document.getElementById('go-stop').className='go-val '+(beActive?'warn':'off');
-    document.getElementById('go-action-wrap').innerHTML=`<div class="go-action"><div class="go-action-title">⚡ PRÓXIMA AÇÃO</div>${mgmt.desc}</div>`;
+  if(mgmt){
+    const beActive=['yellow','orange','red-a'].includes(mgmt.type);
+    const parcActive=['orange','red-a'].includes(mgmt.type);
+    const closeNow=mgmt.type==='red-a';
+    document.getElementById('go-be').textContent=beActive?'ATIVADO':'INATIVO'; document.getElementById('go-be').className='go-val '+(beActive?'on':'off');
+    document.getElementById('go-parc').textContent=parcActive?'50%':'—'; document.getElementById('go-parc').className='go-val '+(parcActive?'warn':'off');
+    document.getElementById('go-stop').textContent=beActive?(signal?.entry.toFixed(dec)||'SIM'):'NÃO'; document.getElementById('go-stop').className='go-val '+(beActive?'on':'off');
+    document.getElementById('go-next').textContent=closeNow?'FECHAR':parcActive?'PARCIAL':'BREAKEVEN'; document.getElementById('go-next').className='go-val '+(closeNow?'danger':parcActive?'warn':'on');
   } else {
-    document.getElementById('go-be').textContent='INATIVO'; document.getElementById('go-be').className='go-val off';
-    document.getElementById('go-parc').textContent='—'; document.getElementById('go-parc').className='go-val off';
-    document.getElementById('go-stop').textContent='—'; document.getElementById('go-stop').className='go-val off';
-    document.getElementById('go-action-wrap').innerHTML='';
+    ['go-be','go-parc','go-stop'].forEach(id=>{ document.getElementById(id).textContent=id==='go-be'?'INATIVO':id==='go-stop'?'NÃO':'—'; document.getElementById(id).className='go-val off'; });
+    document.getElementById('go-next').textContent='MANTER'; document.getElementById('go-next').className='go-val neu';
   }
 
+  // AI Analyst
+  const adxInd=inds.find(i=>i.name==='ADX'), srInd=inds.find(i=>i.name==='STOCH RSI'), h1tf=tfResults.find(t=>t.key==='1h');
+  const adxV=parseFloat(adxInd?.val||0), srV=parseFloat(srInd?.val||50);
+  const h1dir=['BUY','BULL'].includes(h1tf?.sig)?'alta':'baixa';
+  let analystTxt=`Mercado em tendência de ${h1dir} no H1`;
+  if(adxV>25) analystTxt+=`, tendência forte (ADX ${adxV.toFixed(0)}).`;
+  else if(adxV>18) analystTxt+=`, tendência moderada (ADX ${adxV.toFixed(0)}).`;
+  else analystTxt+=`, sem direção definida (ADX ${adxV.toFixed(0)}).`;
+  if(srV>70) analystTxt+=` Stoch RSI sobrecomprado (${srV.toFixed(0)}).`;
+  else if(srV<30) analystTxt+=` Stoch RSI sobrevendido (${srV.toFixed(0)}).`;
+  else analystTxt+=` Momentum ${srV>50?'bullish':'bearish'} (Stoch ${srV.toFixed(0)}).`;
+  let recTxt='Aguardar confluência M15+M5.', riskTxt='MODERADO', riskColor='var(--gold)';
+  if(signal){
+    if(mgmt?.type==='red-a'){ recTxt='Fechar operação agora.'; riskTxt='ALTO'; riskColor='var(--red)'; }
+    else if(mgmt?.type==='orange'){ recTxt='Realizar 50% e mover SL para entrada.'; riskTxt='MODERADO'; riskColor='var(--gold)'; }
+    else if(mgmt?.type==='yellow'){ recTxt=`Mover SL para entrada (${signal.entry.toFixed(dec)}).`; riskTxt='BAIXO'; riskColor='var(--green)'; }
+    else { recTxt=`Manter posição. Alvo: ${signal.tp.toFixed(dec)}.`; riskTxt=adxV>25?'BAIXO':'MODERADO'; riskColor=adxV>25?'var(--green)':'var(--gold)'; }
+  }
+  const atxt=document.getElementById('analyst-txt'), arec=document.getElementById('analyst-rec'), arisk=document.getElementById('analyst-risk');
+  if(atxt) atxt.textContent=analystTxt; if(arec) arec.textContent=recTxt; if(arisk){ arisk.textContent=riskTxt; arisk.style.color=riskColor; }
+
+  // Performance mini
+  const pd=getPerfData('today'), tot=pd.wins+pd.losses, wr=tot>0?((pd.wins/tot)*100).toFixed(0):0;
+  const pmEl=document.getElementById('perf-mini');
+  if(pmEl) pmEl.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
+      <div><div style="font-size:9px;color:var(--muted);font-family:'Share Tech Mono',monospace">LUCRO</div><div style="font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700;color:${pd.pnl>=0?'var(--green)':'var(--red)'}">${pd.pnl>=0?'+':''}$${pd.pnl.toFixed(2)}</div></div>
+      <div><div style="font-size:9px;color:var(--muted);font-family:'Share Tech Mono',monospace">PIPS</div><div style="font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700;color:${pd.pips>=0?'var(--cyan)':'var(--red)'}">${pd.pips>=0?'+':''}${pd.pips.toFixed(0)}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <div><div style="font-size:9px;color:var(--muted);font-family:'Share Tech Mono',monospace">TRADES</div><div style="font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700">${tot}</div></div>
+      <div><div style="font-size:9px;color:var(--muted);font-family:'Share Tech Mono',monospace">WINRATE</div><div style="font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700;color:${parseFloat(wr)>=50?'var(--green)':'var(--red)'}">${wr}%</div></div>
+    </div>`;
+
+  const clbl=document.getElementById('chart-lbl'); if(clbl) clbl.textContent=curAsset;
   updateGestaoDisplay();
 }
 

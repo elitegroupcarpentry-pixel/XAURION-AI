@@ -266,8 +266,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <div><div class="hdr-name">XAURION AI</div><div class="hdr-sub">SISTEMA QUANTITATIVO DE SINAIS</div></div>
     </div>
     <div class="hdr-mid">
-      <div class="asset-btn active" id="ab-XAUUSD" onclick="switchAsset('XAU/USD')">XAU/USD</div>
-      <div class="asset-btn" id="ab-BTCUSD" onclick="switchAsset('BTC/USD')">BTC/USD</div>
+      <div class="asset-btn active" id="ab-XAUUSD" data-asset="XAU/USD" onclick="switchAsset(this.dataset.asset)">XAU/USD</div>
+      <div class="asset-btn" id="ab-BTCUSD" data-asset="BTC/USD" onclick="switchAsset(this.dataset.asset)">BTC/USD</div>
       <div class="live-badge"><div class="live-dot"></div>AO VIVO</div>
       <div class="timer">⏱ <span id="countdown">05:00</span></div>
     </div>
@@ -279,12 +279,12 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
   <div class="body">
     <div class="sidebar">
-      <div class="nav-item active" id="nav-overview" onclick="switchNav('overview')"><i class="fa-solid fa-gauge-high"></i>VISÃO GERAL</div>
-      <div class="nav-item" id="nav-gestao" onclick="switchNav('gestao')"><i class="fa-solid fa-sliders"></i>GESTÃO</div>
-      <div class="nav-item" id="nav-historico" onclick="switchNav('historico')"><i class="fa-solid fa-clock-rotate-left"></i>HISTÓRICO</div>
-      <div class="nav-item" id="nav-estatisticas" onclick="switchNav('estatisticas')"><i class="fa-solid fa-chart-column"></i>ESTATÍSTICAS</div>
-      <div class="nav-item" id="nav-alertas" onclick="switchNav('alertas')"><i class="fa-solid fa-bell"></i>ALERTAS</div>
-      <div class="nav-item" id="nav-configuracoes" onclick="switchNav('configuracoes')"><i class="fa-solid fa-gear"></i>CONFIGURAÇÕES</div>
+      <div class="nav-item active" id="nav-overview" data-nav="overview" onclick="switchNav(this.dataset.nav)"><i class="fa-solid fa-gauge-high"></i>VISÃO GERAL</div>
+      <div class="nav-item" id="nav-gestao" data-nav="gestao" onclick="switchNav(this.dataset.nav)"><i class="fa-solid fa-sliders"></i>GESTÃO</div>
+      <div class="nav-item" id="nav-historico" data-nav="historico" onclick="switchNav(this.dataset.nav)"><i class="fa-solid fa-clock-rotate-left"></i>HISTÓRICO</div>
+      <div class="nav-item" id="nav-estatisticas" data-nav="estatisticas" onclick="switchNav(this.dataset.nav)"><i class="fa-solid fa-chart-column"></i>ESTATÍSTICAS</div>
+      <div class="nav-item" id="nav-alertas" data-nav="alertas" onclick="switchNav(this.dataset.nav)"><i class="fa-solid fa-bell"></i>ALERTAS</div>
+      <div class="nav-item" id="nav-configuracoes" data-nav="configuracoes" onclick="switchNav(this.dataset.nav)"><i class="fa-solid fa-gear"></i>CONFIGURAÇÕES</div>
       <div class="sidebar-bot">
         <div class="ver">XAURION AI v3.0</div>
         <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-power-off"></i> SAIR DO SISTEMA</button>
@@ -353,10 +353,10 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
             <div id="tv-chart" style="flex:1;min-height:260px"></div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;flex-wrap:wrap;gap:4px">
               <div class="tf-row" id="tf-buttons">
-                <button class="tf-btn active" onclick="switchChartTF('M5',this)">M5</button>
-                <button class="tf-btn" onclick="switchChartTF('M15',this)">M15</button>
-                <button class="tf-btn" onclick="switchChartTF('H1',this)">H1</button>
-                <button class="tf-btn" onclick="switchChartTF('1D',this)">1D</button>
+                <button class="tf-btn active" data-tf="M5" onclick="switchChartTFbyEl(this)">M5</button>
+                <button class="tf-btn" data-tf="M15" onclick="switchChartTFbyEl(this)">M15</button>
+                <button class="tf-btn" data-tf="H1" onclick="switchChartTFbyEl(this)">H1</button>
+                <button class="tf-btn" data-tf="1D" onclick="switchChartTFbyEl(this)">1D</button>
               </div>
               <div class="ema-row">
                 <button class="ema-btn e8 on" onclick="toggleEMA(8,this)">EMA 8</button>
@@ -452,10 +452,10 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <!-- ESTATÍSTICAS -->
       <div class="panel" id="panel-estatisticas">
         <div class="period-tabs">
-          <div class="ptab active" onclick="switchStat('today',this)">HOJE</div>
-          <div class="ptab" onclick="switchStat('week',this)">SEMANA</div>
-          <div class="ptab" onclick="switchStat('month',this)">MÊS</div>
-          <div class="ptab" onclick="switchStat('all',this)">TOTAL</div>
+          <div class="ptab active" data-stat="today" onclick="switchStat(this.dataset.stat,this)">HOJE</div>
+          <div class="ptab" data-stat="week" onclick="switchStat(this.dataset.stat,this)">SEMANA</div>
+          <div class="ptab" data-stat="month" onclick="switchStat(this.dataset.stat,this)">MÊS</div>
+          <div class="ptab" data-stat="all" onclick="switchStat(this.dataset.stat,this)">TOTAL</div>
         </div>
         <div class="stat-grid" id="stat-grid"></div>
       </div>

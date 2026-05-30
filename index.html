@@ -6,6 +6,7 @@
 <title>XAURION AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root{--bg:#080E14;--bg2:#0C1520;--bg3:#101D2A;--bg4:#152232;--cyan:#00F5FF;--gold:#FFD700;--green:#00FF88;--red:#FF2D55;--orange:#FF6B00;--purple:#8B5CF6;--blue:#00B0FF;--text:#C8E6F0;--muted:#3D5A6E;--border:rgba(0,245,255,0.08);--glow:0 0 20px rgba(0,245,255,0.25);}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -150,7 +151,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 /* CHART */
 .chart-container{border-radius:4px;overflow:hidden;border:1px solid var(--border);}
-#tv-chart{width:100%;height:340px;}
+#tv-chart{width:100%;height:240px;}
 .tf-selector{display:flex;gap:4px;margin-top:6px;}
 .tf-btn{padding:4px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:2px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:15px;color:var(--muted);transition:all 0.2s;letter-spacing:1px;}
 .tf-btn:hover{color:var(--cyan);}
@@ -290,7 +291,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <!-- ═══ LOGIN ═══ -->
 <div id="screen-login">
   <div class="login-card">
-    <div class="login-ico">⚡</div>
+    <div class="login-ico"><i class="fa-solid fa-bolt" style="font-size:36px;color:var(--cyan)"></i></div>
     <div class="login-logo">XAURION AI</div>
     <div class="login-sub">SISTEMA QUANTITATIVO DE SINAIS</div>
     <div class="login-title" id="login-title">ACESSO AO SISTEMA</div>
@@ -306,7 +307,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <div id="screen-app">
   <header class="app-hdr">
     <div class="hdr-logo">
-      <div class="hdr-logo-ico">⚡</div>
+      <div class="hdr-logo-ico"><i class="fa-solid fa-bolt" style="color:var(--cyan)"></i></div>
       <div>
         <div class="hdr-logo-txt">XAURION AI</div>
         <div class="hdr-logo-sub">SISTEMA QUANTITATIVO DE SINAIS</div>
@@ -321,22 +322,22 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <div class="timer-badge">⏱ <span id="countdown">05:00</span></div>
     </div>
     <div class="hdr-right">
-      <button class="hdr-btn" id="snd-btn" onclick="toggleSound()" title="Som">🔕</button>
-      <button class="hdr-btn" onclick="runAnalysis()" title="Atualizar">🔄</button>
+      <button class="hdr-btn" id="snd-btn" onclick="toggleSound()" title="Som"><i class="fa-solid fa-volume-xmark"></i></button>
+      <button class="hdr-btn" onclick="runAnalysis()" title="Atualizar"><i class="fa-solid fa-rotate"></i></button>
     </div>
   </header>
 
   <div class="app-body">
     <aside id="sidebar">
-      <div class="nav-item active" onclick="switchNav('overview')" id="nav-overview"><span class="nav-ico">📡</span>VISÃO GERAL</div>
-      <div class="nav-item" onclick="switchNav('gestao')" id="nav-gestao"><span class="nav-ico">💰</span>GESTÃO</div>
-      <div class="nav-item" onclick="switchNav('historico')" id="nav-historico"><span class="nav-ico">📋</span>HISTÓRICO</div>
-      <div class="nav-item" onclick="switchNav('estatisticas')" id="nav-estatisticas"><span class="nav-ico">📊</span>ESTATÍSTICAS</div>
-      <div class="nav-item" onclick="switchNav('alertas')" id="nav-alertas"><span class="nav-ico">🔔</span>ALERTAS</div>
-      <div class="nav-item" onclick="switchNav('configuracoes')" id="nav-configuracoes"><span class="nav-ico">⚙️</span>CONFIGURAÇÕES</div>
+      <div class="nav-item active" onclick="switchNav('overview')" id="nav-overview"><i class="fa-solid fa-gauge-high nav-ico"></i>VISÃO GERAL</div>
+      <div class="nav-item" onclick="switchNav('gestao')" id="nav-gestao"><i class="fa-solid fa-sliders nav-ico"></i>GESTÃO</div>
+      <div class="nav-item" onclick="switchNav('historico')" id="nav-historico"><i class="fa-solid fa-clock-rotate-left nav-ico"></i>HISTÓRICO</div>
+      <div class="nav-item" onclick="switchNav('estatisticas')" id="nav-estatisticas"><i class="fa-solid fa-chart-column nav-ico"></i>ESTATÍSTICAS</div>
+      <div class="nav-item" onclick="switchNav('alertas')" id="nav-alertas"><i class="fa-solid fa-bell nav-ico"></i>ALERTAS</div>
+      <div class="nav-item" onclick="switchNav('configuracoes')" id="nav-configuracoes"><i class="fa-solid fa-gear nav-ico"></i>CONFIGURAÇÕES</div>
       <div class="sidebar-bot">
         <div class="ver-txt">XAURION AI v3.0.0</div>
-        <button class="btn-logout" onclick="logout()">⏻ SAIR DO SISTEMA</button>
+        <button class="btn-logout" onclick="logout()"><i class="fa-solid fa-power-off"></i> SAIR DO SISTEMA</button>
       </div>
     </aside>
 
@@ -350,7 +351,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
           <div class="card sig-main">
             <div class="sig-wait-lbl">SINAL ATIVO</div>
             <div id="sig-card-inner">
-              <div class="sig-big sig-wait-big">MONITORANDO <span id="sig-animal-ico" style="font-size:24px">👁</span></div>
+              <div class="sig-big sig-wait-big"><i class="fa-solid fa-satellite-dish" style="font-size:20px;margin-right:8px"></i>MONITORANDO</div>
               <div class="sig-conf-row"><span class="sig-conf-lbl">Aguardando confluência M15 + M5...</span></div>
             </div>
           </div>
@@ -577,7 +578,7 @@ const API_KEY = 'e1855d2e342d4207bd55de2b6a631474';
 const SK = { auth:'xau_auth', account:'xau_account', history:'xau_history', perf:'xau_perf', alerts:'xau_alerts', signals:'xau_signals' };
 const ASSETS = {
   'XAU/USD': { sym:'XAU/USD', label:'XAU/USD · OURO',    dec:2, pip:0.1 },
-  'BTC/USD': { sym:'BTC/USD', label:'BTC/USD · BITCOIN',  dec:0, pip:1   }
+  'BTC/USD': { sym:'BTC/USD', label:'BTC/USD · BITCOIN',  dec:0, pip:1, apiSym:'BTC/USD'   }
 };
 const TF_API = { 'M2':'2min','M5':'5min','M15':'15min','H1':'1h','4H':'4h','1D':'1day' };
 
@@ -829,7 +830,7 @@ function renderAlerts(){
   const alerts = loadAlertsList();
   const el = document.getElementById('alertas-list');
   if(!alerts.length){ el.innerHTML='<div class="no-data">Nenhum alerta</div>'; return; }
-  const icons = { info:'ℹ️', warn:'⚠️', danger:'🔴', win:'✅', loss:'❌' };
+  const icons = { info:'<i class="fa-solid fa-circle-info"></i>', warn:'<i class="fa-solid fa-triangle-exclamation"></i>', danger:'<i class="fa-solid fa-circle-xmark"></i>', win:'<i class="fa-solid fa-circle-check"></i>', loss:'<i class="fa-solid fa-circle-xmark"></i>' };
   el.innerHTML = alerts.map(a=>`<div class="alert-item ${a.type==='win'?'info':a.type==='loss'?'danger':a.type}">
     <span class="alert-ico">${icons[a.type]||'ℹ️'}</span>
     <div class="alert-body"><div class="alert-msg">${a.msg}</div><div class="alert-time">${a.time}</div></div>
@@ -950,6 +951,28 @@ function calcPips(asset, entry, exit, type){
   const isBuy=type==='BUY';
   const diff=isBuy?exit-entry:entry-exit;
   return Math.round(diff / ASSETS[asset].pip);
+}
+
+
+// ═══════════════════════════════════════════
+// MARKET HOURS
+// ═══════════════════════════════════════════
+function isMarketOpen(asset) {
+  if(asset === 'BTC/USD') return true; // Crypto 24/7
+  // XAU/USD: Sunday 22:00 UTC → Friday 21:59 UTC
+  const now = new Date();
+  const day = now.getUTCDay(); // 0=Sun, 6=Sat
+  const hour = now.getUTCHours();
+  if(day === 6) return false; // Saturday: always closed
+  if(day === 0 && hour < 22) return false; // Sunday before 22:00 UTC
+  if(day === 5 && hour >= 22) return false; // Friday after 22:00 UTC
+  return true;
+}
+
+function getMarketStatusMsg(asset) {
+  if(isMarketOpen(asset)) return null;
+  if(asset === 'XAU/USD') return '<i class="fa-solid fa-lock"></i> MERCADO FECHADO — XAU/USD opera Seg-Sex. Sinais bloqueados.';
+  return null;
 }
 
 // ═══════════════════════════════════════════
@@ -1083,7 +1106,7 @@ function playSound(type){
 function toggleSound(){
   soundOn=!soundOn;
   const b=document.getElementById('snd-btn');
-  b.textContent=soundOn?'🔔':'🔕';
+  b.innerHTML=soundOn?'<i class="fa-solid fa-volume-high"></i>':'<i class="fa-solid fa-volume-xmark"></i>';
   try{ const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=soundOn?600:300;g.gain.setValueAtTime(0.3,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.12);o.start();o.stop(ctx.currentTime+0.12); }catch(e){}
 }
 
@@ -1101,7 +1124,7 @@ function initTVChart(){
   if(!container||!window.LightweightCharts) return;
   const w=container.parentElement.clientWidth-22;
   tvChart=LightweightCharts.createChart(container,{
-    width:w, height:340,
+    width:w, height:240,
     layout:{ background:{color:'#060D14'}, textColor:'#3D5A6E' },
     grid:{ vertLines:{color:'rgba(0,245,255,0.04)'}, horzLines:{color:'rgba(0,245,255,0.04)'} },
     crosshair:{ mode:LightweightCharts.CrosshairMode.Normal },
@@ -1113,7 +1136,7 @@ function initTVChart(){
   tvEma20=tvChart.addLineSeries({ color:'#00B0FF',lineWidth:1,title:'EMA20',priceLineVisible:false,lastValueVisible:false });
   tvEma200=tvChart.addLineSeries({ color:'#8B5CF6',lineWidth:1.5,title:'EMA200',priceLineVisible:false,lastValueVisible:false });
   chartInitialized=true;
-  new ResizeObserver(()=>{ if(tvChart){ const el=document.getElementById('tv-chart'); tvChart.resize(el.parentElement.clientWidth-22,340); } }).observe(container.parentElement);
+  new ResizeObserver(()=>{ if(tvChart){ const el=document.getElementById('tv-chart'); tvChart.resize(el.parentElement.clientWidth-22,240); } }).observe(container.parentElement);
 }
 
 function updateTVChart(candles){
@@ -1163,18 +1186,16 @@ function renderOverviewSignal(signal, tfResults, inds, mgmt, currentPrice){
 
   // Signal card
   const sigInner=document.getElementById('sig-card-inner');
-  const sigAnimal=document.getElementById('sig-animal-ico');
+  
   if(!signal){
-    sigInner.innerHTML=`<div class="sig-big sig-wait-big">MONITORANDO <span style="font-size:24px">👁</span></div>
+    sigInner.innerHTML=`<div class="sig-big sig-wait-big"><i class="fa-solid fa-satellite-dish" style="font-size:22px;margin-right:8px"></i>MONITORANDO</div>
       <div class="sig-conf-row"><span class="sig-conf-lbl">Aguardando M15 + M5 alinhados...</span></div>`;
   } else {
     const isBuy=signal.type==='BUY', cls=isBuy?'sig-buy':'sig-sell';
     const prob=calcProbability(tfResults,inds,signal);
     const pCls=prob>=70?'var(--green)':prob>=50?'var(--gold)':'var(--red)';
-    sigAnimal.textContent=isBuy?'🐂':'🐻';
-    sigAnimal.style.color=isBuy?'var(--green)':'var(--red)';
     sigInner.innerHTML=`
-      <div class="sig-big ${cls}">${isBuy?'▲ COMPRA':'▼ VENDA'} <span style="font-size:24px">${isBuy?'🐂':'🐻'}</span></div>
+      <div class="sig-big ${cls}">${isBuy?'▲ COMPRA':'▼ VENDA'} <i class="fa-solid ${isBuy?'fa-arrow-trend-up':'fa-arrow-trend-down'}" style="font-size:22px"></i></div>
       <div class="sig-conf-row">
         <span class="sig-conf-lbl">CONFIANÇA</span>
         <span class="sig-conf-val" style="color:${pCls};font-family:'Orbitron',monospace;font-size:22px;font-weight:900;margin-left:8px">${prob}%</span>
@@ -1253,9 +1274,9 @@ function renderOverviewSignal(signal, tfResults, inds, mgmt, currentPrice){
   const adxV=parseFloat(m5Adx?.val||0);
   const m5sig=tfResults.find(t=>t.key==='5min')?.sig||'NEUTRAL';
   let mktState,mktCls,mktIco;
-  if(adxV>=25){ mktState='TREND FORTE'; mktCls='trend'; mktIco=['BUY','BULL'].includes(m5sig)?'🐂':'🐻'; }
-  else if(adxV>=18){ mktState='EM TENDÊNCIA'; mktCls='trend'; mktIco=['BUY','BULL'].includes(m5sig)?'🐂':'🐻'; }
-  else{ mktState='RANGING'; mktCls='ranging'; mktIco='↔'; }
+  if(adxV>=25){ mktState='TREND FORTE'; mktCls='trend'; mktIco=['BUY','BULL'].includes(m5sig)?'<i class="fa-solid fa-arrow-trend-up" style="color:var(--green)"></i>':'<i class="fa-solid fa-arrow-trend-down" style="color:var(--red)"></i>'; }
+  else if(adxV>=18){ mktState='EM TENDÊNCIA'; mktCls='trend'; mktIco=['BUY','BULL'].includes(m5sig)?'<i class="fa-solid fa-arrow-trend-up" style="color:var(--green)"></i>':'<i class="fa-solid fa-arrow-trend-down" style="color:var(--red)"></i>'; }
+  else{ mktState='RANGING'; mktCls='ranging'; mktIco='<i class="fa-solid fa-arrows-left-right" style="color:var(--gold)"></i>'; }
   document.getElementById('mkt-ico').textContent=mktIco;
   document.getElementById('mkt-state').textContent=mktState;
   document.getElementById('mkt-state').className='mkt-state '+mktCls;
@@ -1417,7 +1438,11 @@ async function runAnalysis(){
   ];
 
   let signal=activeSignals[curAsset]||null;
-  if(!signal){
+  const marketOpen = isMarketOpen(curAsset);
+  if(!marketOpen && !signal) {
+    addAlert('warn', getMarketStatusMsg(curAsset) || 'Mercado fechado — sinais bloqueados');
+  }
+  if(!signal && marketOpen){
     const ns=generateSignal(tfResults,m5Candles);
     if(ns){
       signal=ns; activeSignals[curAsset]=signal; saveActiveSignals();
@@ -1438,7 +1463,13 @@ async function runAnalysis(){
   if(mgmt) addAlert('warn',`${mgmt.msg} — ${curAsset} @ ${price.toFixed(dec)}`);
 
   cache[curAsset]={ m5Candles,price,tfResults,inds:m5Inds,atr };
-  if(curNav==='overview') renderOverviewSignal(signal,tfResults,m5Inds,mgmt,price);
+  if(curNav==='overview'){
+    renderOverviewSignal(signal,tfResults,m5Inds,mgmt,price);
+    if(!marketOpen){
+      const sc=document.getElementById('sig-card-inner');
+      if(sc&&!signal) sc.innerHTML='<div class="sig-big" style="color:var(--gold);font-size:16px"><i class="fa-solid fa-lock"></i> MERCADO FECHADO</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:12px;color:var(--muted);margin-top:6px">XAU/USD fechado no fim de semana. Próxima abertura: Segunda 00:00 UTC.</div>';
+    }
+  }
   updateTVChart(m5Candles);
   renderHistoryRecent(); renderPerfPanel(); updateGestaoDisplay(); renderStats();
 

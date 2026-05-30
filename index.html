@@ -628,6 +628,7 @@ document.getElementById('l-pwd').addEventListener('keydown', e => { if(e.key==='
 document.getElementById('l-pwd2').addEventListener('keydown', e => { if(e.key==='Enter') handleAuth(); });
 
 function startApp() {
+  console.log('Starting app...');
   localStorage.setItem('xau_session','1');
   document.getElementById('screen-login').style.display = 'none';
   document.getElementById('screen-app').style.display = 'flex';
@@ -637,11 +638,13 @@ function startApp() {
   renderGestaoPanel();
   renderHistoryFull();
   renderAlerts();
-  // Delay chart init so the DOM is fully painted first
-  setTimeout(() => {
-    initTVChart();
-    runAnalysis();
-  }, 100);
+  // Wait for DOM to be fully painted before initializing chart
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      initTVChart();
+      runAnalysis();
+    });
+  });
   priceMonInt = setInterval(monitorPrices, 60000);
 }
 
@@ -708,13 +711,15 @@ function saveAccountCfg(){
 }
 function updateGestaoDisplay(){
   const rA = account.balance * (account.riskPct/100);
-  document.getElementById('g-bal').textContent  = '$'+account.balance.toFixed(2);
-  document.getElementById('g-risk').textContent = '$'+rA.toFixed(2);
-  document.getElementById('g-gain').textContent = '$'+(rA*2).toFixed(2);
-  document.getElementById('g-lot').textContent  = Math.max(0.01,(rA/1000).toFixed(2));
-  document.getElementById('gc-bal').textContent  = '$'+account.balance.toFixed(2);
-  document.getElementById('gc-risk').textContent = '$'+rA.toFixed(2);
-  document.getElementById('gc-lot').textContent  = Math.max(0.01,(rA/1000).toFixed(2));
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('g-bal','$'+account.balance.toFixed(2));
+  set('g-risk','$'+rA.toFixed(2));
+  set('g-gain','$'+(rA*2).toFixed(2));
+  set('g-lot',Math.max(0.01,(rA/1000).toFixed(2)));
+  set('gc-bal','$'+account.balance.toFixed(2));
+  set('gc-risk','$'+rA.toFixed(2));
+  set('gc-lot',Math.max(0.01,(rA/1000).toFixed(2)));
+  set('gc-dd',(account.maxDrawdown||0).toFixed(2)+'%');
 }
 
 function loadHistory(){ try{ return JSON.parse(localStorage.getItem(SK.history))||[]; }catch(e){ return []; } }
@@ -787,7 +792,7 @@ function renderPerfPanel(){
 function switchPerfTab(t, btn){
   curPerfTab=t;
   document.querySelectorAll('.pp-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   renderPerfPanel();
 }
 
@@ -1512,5 +1517,18 @@ function resetTicker(){
   },1000);
 }
 </script>
+
+  <!-- Hidden elements referenced by JS -->
+  <div style="display:none">
+    <span id="mkt-price"></span>
+    <span id="mkt-state"></span>
+    <span id="mkt-ico"></span>
+    <span id="mkt-vol"></span>
+    <span id="gc-bal"></span>
+    <span id="gc-risk"></span>
+    <span id="gc-lot"></span>
+    <span id="gc-dd"></span>
+    <div id="perf-rows"></div>
+  </div>
 </body>
 </html>
